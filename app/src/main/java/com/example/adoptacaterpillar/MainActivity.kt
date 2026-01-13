@@ -24,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.adoptacaterpillar.ui.navigation.Screen
 import com.example.adoptacaterpillar.ui.screens.AboutScreen
 import com.example.adoptacaterpillar.ui.screens.CatDetailScreen
+import com.example.adoptacaterpillar.ui.screens.CatFactScreen
 import com.example.adoptacaterpillar.ui.screens.CatListScreen
 import com.example.adoptacaterpillar.ui.screens.RandomCatScreen
 import com.example.adoptacaterpillar.ui.theme.AdoptACaterpillarTheme
@@ -46,7 +47,7 @@ class MainActivity : ComponentActivity() {
 fun MainApp() {
     val navController = rememberNavController()
     val viewModel: CatViewModel = viewModel()
-    
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     val currentRoute = currentDestination?.route
@@ -54,6 +55,7 @@ fun MainApp() {
     val items = listOf(
         Triple(Screen.RandomCat, "Random", Icons.Filled.Refresh),
         Triple(Screen.CatList, "Adopt", Icons.Filled.List),
+        Triple(Screen.CatFacts, "Facts", Icons.Filled.Info),
         Triple(Screen.About, "About", Icons.Filled.Info)
     )
 
@@ -65,13 +67,15 @@ fun MainApp() {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { 
-                    Text(when {
-                        currentRoute?.startsWith("cat_detail") == true -> "Détails du chat"
-                        currentRoute == Screen.CatList.route -> "Adopter un chat"
-                        currentRoute == Screen.About.route -> "À propos"
-                        else -> "Chat Aléatoire"
-                    })
+                title = {
+                    Text(
+                        when {
+                            currentRoute?.startsWith("cat_detail") == true -> "Détails du chat"
+                            currentRoute == Screen.CatList.route -> "Adopter un chat"
+                            currentRoute == Screen.About.route -> "À propos"
+                            else -> "Chat Aléatoire"
+                        }
+                    )
                 },
                 navigationIcon = {
                     if (showBackButton) {
@@ -109,12 +113,13 @@ fun MainApp() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.RandomCat.route) { RandomCatScreen(viewModel) }
-            composable(Screen.CatList.route) { 
+            composable(Screen.CatList.route) {
                 CatListScreen(viewModel) { catId ->
                     navController.navigate(Screen.CatDetail.createRoute(catId))
                 }
             }
             composable(Screen.About.route) { AboutScreen() }
+            composable(Screen.CatFacts.route) { CatFactScreen() }
             composable(Screen.CatDetail.route) { backStackEntry ->
                 val catId = backStackEntry.arguments?.getString("catId")
                 CatDetailScreen(viewModel, catId)

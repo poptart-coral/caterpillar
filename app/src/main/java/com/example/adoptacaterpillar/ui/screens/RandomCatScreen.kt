@@ -17,7 +17,7 @@ import com.example.adoptacaterpillar.ui.viewmodel.CatViewModel
 
 @Composable
 fun RandomCatScreen(viewModel: CatViewModel) {
-    val refreshKey by viewModel.refreshTrigger.collectAsState()  // Use refreshTrigger
+    val refreshKey by viewModel.refreshTrigger.collectAsState() // Use refreshTrigger
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -26,7 +26,7 @@ fun RandomCatScreen(viewModel: CatViewModel) {
     ) {
         SubcomposeAsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data("https://cataas.com/cat?refresh=$refreshKey")  // URL with key
+                .data("https://cataas.com/cat?refresh=$refreshKey") // URL with key
                 .diskCachePolicy(CachePolicy.DISABLED)
                 .memoryCachePolicy(CachePolicy.DISABLED)
                 .build(),

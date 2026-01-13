@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CatImageDao {
     @Query("SELECT * FROM cached_cat_images ORDER BY downloadedAt DESC LIMIT 1")
-    suspend fun getLatestRandomCat(): CachedCatImage?  //
+    suspend fun getLatestRandomCat(): CachedCatImage? //
 
     @Query("SELECT * FROM cached_cat_images ORDER BY downloadedAt DESC")
     fun getAllRandomCats(): Flow<List<CachedCatImage>>
@@ -15,4 +15,3 @@ interface CatImageDao {
     @Insert
     suspend fun insert(image: CachedCatImage)
 }
-

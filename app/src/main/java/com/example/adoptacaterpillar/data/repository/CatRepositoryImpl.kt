@@ -33,7 +33,7 @@ class CatRepositoryImpl(private val context: Context) : CatRepository {
     // Download and save a new image
     suspend fun downloadAndCacheRandomCat(): Result<String> = withContext(Dispatchers.IO) {
         try {
-            val url = "https://cataas.com/cat}"
+            val url = "https://cataas.com/cat"
             val fileName = "random_cat_${System.currentTimeMillis()}.jpg"
             val file = File(context.filesDir, fileName)
 
