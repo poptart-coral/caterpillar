@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.spotless)
 }
 
 android {
@@ -26,7 +28,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -63,6 +65,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation("io.coil-kt.coil3:coil-compose:3.0.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0")
+    implementation(libs.kotlinx.serialization.json)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -70,4 +73,30 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+spotless {
+    kotlin {
+        target("**/*.kt")
+        targetExclude("**/build/**", "**/generated/**")
+
+        ktlint("1.1.1")
+            .editorConfigOverride(
+                mapOf(
+                    "android" to "true",
+                    "max_line_length" to "200",
+                    "indent_size" to "4",
+                    "ktlint_standard_no-wildcard-imports" to "disabled",
+                    "ktlint_standard_trailing-comma-on-call-site" to "disabled",
+                    "ktlint_standard_trailing-comma-on-declaration-site" to "disabled",
+                    "ktlint_standard_property-naming" to "disabled",
+                    "ktlint_standard_function-naming" to "disabled",
+                ),
+            )
+    }
+
+    kotlinGradle {
+        target("*.gradle.kts")
+        ktlint("1.1.1")
+    }
 }
