@@ -3,15 +3,19 @@ package com.example.adoptacaterpillar.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.adoptacaterpillar.R
-import com.example.adoptacaterpillar.data.repository.CatFactRepository
+import com.example.adoptacaterpillar.data.repository.CatRepositoryImpl
 import com.example.adoptacaterpillar.domain.model.CatFact
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CatFactViewModel : ViewModel() {
-    private val repository = CatFactRepository()
+@HiltViewModel
+class CatFactViewModel @Inject constructor(
+    private val repository: CatRepositoryImpl
+) : ViewModel() {
 
     private val catImages = listOf(
         R.drawable.cat1,

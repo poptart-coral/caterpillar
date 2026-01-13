@@ -2,6 +2,8 @@ package com.example.adoptacaterpillar.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -10,11 +12,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.adoptacaterpillar.ui.viewmodel.CatFactViewModel
 
 @Composable
-fun CatFactScreen(viewModel: CatFactViewModel = viewModel()) {
+fun CatFactScreen(viewModel: CatFactViewModel = hiltViewModel()) {
     val imageRes by viewModel.currentImageRes.collectAsState()
     val fact by viewModel.currentFact.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -22,6 +24,7 @@ fun CatFactScreen(viewModel: CatFactViewModel = viewModel()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center

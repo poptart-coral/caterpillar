@@ -1,7 +1,8 @@
 package com.example.adoptacaterpillar.di
 
 import android.content.Context
-import com.example.adoptacaterpillar.data.remote.api.TheCatApiService
+import com.example.adoptacaterpillar.data.remote.api.CatBreedsService
+import com.example.adoptacaterpillar.data.remote.api.CatFactsApiService
 import com.example.adoptacaterpillar.data.repository.CatRepositoryImpl
 import dagger.Module
 import dagger.Provides
@@ -16,7 +17,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideCatRepository(@ApplicationContext context: Context, apiService: TheCatApiService): CatRepositoryImpl {
-        return CatRepositoryImpl(context, apiService)
+    fun provideCatRepository(@ApplicationContext context: Context, apiService: CatBreedsService, catFactsApiService: CatFactsApiService): CatRepositoryImpl {
+        return CatRepositoryImpl(context, apiService, catFactsApiService)
     }
 }
