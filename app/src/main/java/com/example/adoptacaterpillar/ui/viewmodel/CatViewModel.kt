@@ -2,14 +2,19 @@ package com.example.adoptacaterpillar.ui.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import com.example.adoptacaterpillar.data.repository.CatRepositoryImpl
 import com.example.adoptacaterpillar.domain.model.Cat
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
 
-class CatViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository = CatRepositoryImpl(application.applicationContext)
+@HiltViewModel
+class CatViewModel @Inject constructor(
+    private val repository: CatRepositoryImpl
+) : ViewModel() {
 
     private val _cats = MutableStateFlow<List<Cat>>(emptyList())
     val cats: StateFlow<List<Cat>> = _cats.asStateFlow()
@@ -18,7 +23,7 @@ class CatViewModel(application: Application) : AndroidViewModel(application) {
     val refreshTrigger: StateFlow<Int> = _refreshTrigger.asStateFlow()
 
     init {
-        _cats.value = repository.getDummyCats()
+        _cats.value = emptyList()
     }
 
     fun refreshRandomCat() {

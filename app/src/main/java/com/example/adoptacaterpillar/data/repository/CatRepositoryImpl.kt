@@ -3,69 +3,45 @@ package com.example.adoptacaterpillar.data.repository
 import android.content.Context
 import android.util.Log
 import com.example.adoptacaterpillar.data.local.AppDatabase
-import com.example.adoptacaterpillar.data.local.entity.CachedCatImage
-import com.example.adoptacaterpillar.domain.model.Cat
+import com.example.adoptacaterpillar.data.remote.api.TheCatApiService
+import com.example.adoptacaterpillar.domain.model.Breed
 import com.example.adoptacaterpillar.domain.repository.CatRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.net.URL
-import java.util.UUID
+import javax.inject.Inject
 
-class CatRepositoryImpl(private val context: Context) : CatRepository {
+class CatRepositoryImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val apiService: TheCatApiService
+) : CatRepository {
     private val dao = AppDatabase.getDatabase(context).catImageDao()
-
-    override fun getDummyCats(): List<Cat> {
-        return listOf(
-            Cat(UUID.randomUUID().toString(), "Whiskers", "Tabby", "local_cat_1", "A very friendly tabby cat."),
-            Cat(UUID.randomUUID().toString(), "Luna", "Siamese", "local_cat_2", "Luna loves to meow and play."),
-            Cat(UUID.randomUUID().toString(), "Oliver", "Maine Coon", "local_cat_3", "Oliver is a large and fluffy cat."),
-            Cat(UUID.randomUUID().toString(), "Leo", "Bengal", "local_cat_4", "Leo is very active and playful.")
-        )
-    }
-
-    // Returns image in cache (for offline first)
-    fun getCachedRandomCats(): Flow<List<CachedCatImage>> {
-        return dao.getAllRandomCats()
-    }
-
-    // Download and save a new image
-    suspend fun downloadAndCacheRandomCat(): Result<String> = withContext(Dispatchers.IO) {
-        try {
-            val url = "https://cataas.com/cat"
-            val fileName = "random_cat_${System.currentTimeMillis()}.jpg"
-            val file = File(context.filesDir, fileName)
-
-            // Download the image
-            URL(url).openStream().use { input ->
-                file.outputStream().use { output ->
-                    input.copyTo(output)
-                }
-            }
-
-            // Save in Room
-            val cachedImage = CachedCatImage(
-                imageFilePath = file.absolutePath,
-                downloadedAt = System.currentTimeMillis(),
-                isRandomCat = true
-            )
-            dao.insert(cachedImage)
-
-            Log.d("CatRepo", "Image downloaded and cached in ${file.absolutePath}")
-            Result.success(file.absolutePath)
-        } catch (e: Exception) {
-            Log.e("CatRepo", "Download error: ${e.message}")
-            Result.failure(e)
-        }
-    }
-
-    // Get the last cached cat image
-    suspend fun getLatestCachedCat(): String? = withContext(Dispatchers.IO) {
-        dao.getLatestRandomCat()?.imageFilePath
-    }
 
     override fun getRandomCatUrl(): String {
         return "https://cataas.com/cat?timestamp=${System.currentTimeMillis()}"
+    }
+
+    override suspend fun getBreeds(): Result<List<Breed>> = withContext(Dispatchers.IO) {
+        try {
+            Log.d("CatRepo", "Fetching breeds from API...")
+            val breedsDto = apiService.getBreeds()
+
+            val breeds = breedsDto.map { dto ->
+                Breed(
+                    id = dto.id,
+                    name = dto.name,
+                    temperament = dto.temperament,
+                    description = dto.description,
+                    lifeSpan = dto.life_span,
+                    origin = dto.origin
+                )
+            }
+
+            Log.d("CatRepo", "✅ Fetched ${breeds.size} breeds")
+            Result.success(breeds)
+        } catch (e: Exception) {
+            Log.e("CatRepo", "❌ Error fetching breeds: ${e.message}", e)
+            Result.failure(e)
+        }
     }
 }

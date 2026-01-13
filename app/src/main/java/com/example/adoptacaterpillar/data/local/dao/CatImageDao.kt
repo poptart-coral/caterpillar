@@ -6,12 +6,16 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CatImageDao {
-    @Query("SELECT * FROM cached_cat_images ORDER BY downloadedAt DESC LIMIT 1")
-    suspend fun getLatestRandomCat(): CachedCatImage? //
 
-    @Query("SELECT * FROM cached_cat_images ORDER BY downloadedAt DESC")
-    fun getAllRandomCats(): Flow<List<CachedCatImage>>
+    @Query("SELECT * FROM cached_cats ORDER BY downloadedAt DESC")
+    fun getAllCats(): Flow<List<CachedCatImage>>
 
-    @Insert
-    suspend fun insert(image: CachedCatImage)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(cats: List<CachedCatImage>)
+
+    @Query("DELETE FROM cached_cats")
+    suspend fun deleteAll()
+
+    @Query("SELECT COUNT(*) FROM cached_cats")
+    suspend fun getCount(): Int
 }

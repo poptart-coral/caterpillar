@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.example.adoptacaterpillar.data.local.dao.CatImageDao
 import com.example.adoptacaterpillar.data.local.entity.CachedCatImage
 
-@Database(entities = [CachedCatImage::class], version = 1, exportSchema = false)
+@Database(entities = [CachedCatImage::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun catImageDao(): CatImageDao
 
@@ -17,11 +17,15 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
-                Room.databaseBuilder(
+                val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "cat_db"
-                ).build().also { INSTANCE = it }
+                    "cat_database"
+                )
+                    .fallbackToDestructiveMigration(false)
+                    .build()
+                INSTANCE = instance
+                instance
             }
         }
     }

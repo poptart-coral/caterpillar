@@ -7,13 +7,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -29,7 +30,10 @@ import com.example.adoptacaterpillar.ui.screens.CatListScreen
 import com.example.adoptacaterpillar.ui.screens.RandomCatScreen
 import com.example.adoptacaterpillar.ui.theme.AdoptACaterpillarTheme
 import com.example.adoptacaterpillar.ui.viewmodel.CatViewModel
+import com.example.adoptacaterpillar.ui.screens.BreedListScreen
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +50,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainApp() {
     val navController = rememberNavController()
-    val viewModel: CatViewModel = viewModel()
+    val viewModel: CatViewModel = hiltViewModel()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -54,7 +58,8 @@ fun MainApp() {
 
     val items = listOf(
         Triple(Screen.RandomCat, "Random", Icons.Filled.Refresh),
-        Triple(Screen.CatList, "Adopt", Icons.Filled.List),
+        Triple(Screen.CatList, "Adopt", Icons.AutoMirrored.Filled.List),
+        Triple(Screen.Breeds, "Breeds", Icons.Filled.Info),
         Triple(Screen.CatFacts, "Facts", Icons.Filled.Info),
         Triple(Screen.About, "About", Icons.Filled.Info)
     )
@@ -119,6 +124,7 @@ fun MainApp() {
                 }
             }
             composable(Screen.About.route) { AboutScreen() }
+            composable(Screen.Breeds.route) { BreedListScreen() }
             composable(Screen.CatFacts.route) { CatFactScreen() }
             composable(Screen.CatDetail.route) { backStackEntry ->
                 val catId = backStackEntry.arguments?.getString("catId")
