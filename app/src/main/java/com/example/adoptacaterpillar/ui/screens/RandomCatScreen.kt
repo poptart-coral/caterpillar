@@ -14,10 +14,10 @@ import coil3.compose.SubcomposeAsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import com.example.adoptacaterpillar.ui.viewmodel.CatViewModel
-import java.io.File
+
 @Composable
 fun RandomCatScreen(viewModel: CatViewModel) {
-    val refreshKey by viewModel.refreshTrigger.collectAsState()  // <<< Utilise refreshTrigger
+    val refreshKey by viewModel.refreshTrigger.collectAsState()  // Use refreshTrigger
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -26,7 +26,7 @@ fun RandomCatScreen(viewModel: CatViewModel) {
     ) {
         SubcomposeAsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data("https://cataas.com/cat?refresh=$refreshKey")  // <<< URL avec clé
+                .data("https://cataas.com/cat?refresh=$refreshKey")  // URL with key
                 .diskCachePolicy(CachePolicy.DISABLED)
                 .memoryCachePolicy(CachePolicy.DISABLED)
                 .build(),
@@ -43,7 +43,7 @@ fun RandomCatScreen(viewModel: CatViewModel) {
                     modifier = Modifier.fillMaxWidth().height(400.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Erreur: vérifiez votre connexion")
+                    Text("Error: check your connection")
                 }
             },
             contentDescription = "Random Cat",

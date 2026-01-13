@@ -25,26 +25,26 @@ class CatRepositoryImpl(private val context: Context) : CatRepository {
         )
     }
 
-    // Retourne les images en cache (offline-first)
+    // Returns image in cache (for offline first)
     fun getCachedRandomCats(): Flow<List<CachedCatImage>> {
         return dao.getAllRandomCats()
     }
 
-    // Télécharge et sauvegarde une nouvelle image
+    // Download and save a new image
     suspend fun downloadAndCacheRandomCat(): Result<String> = withContext(Dispatchers.IO) {
         try {
-            val url = "https://cataas.com/cat?timestamp=${System.currentTimeMillis()}"
+            val url = "https://cataas.com/cat}"
             val fileName = "random_cat_${System.currentTimeMillis()}.jpg"
             val file = File(context.filesDir, fileName)
 
-            // Télécharger l'image
+            // Download the image
             URL(url).openStream().use { input ->
                 file.outputStream().use { output ->
                     input.copyTo(output)
                 }
             }
 
-            // Sauvegarder dans Room
+            // Save in Room
             val cachedImage = CachedCatImage(
                 imageFilePath = file.absolutePath,
                 downloadedAt = System.currentTimeMillis(),
@@ -52,15 +52,15 @@ class CatRepositoryImpl(private val context: Context) : CatRepository {
             )
             dao.insert(cachedImage)
 
-            Log.d("CatRepo", "✅ Image téléchargée et sauvegardée: ${file.absolutePath}")
+            Log.d("CatRepo", "Image downloaded and cached in ${file.absolutePath}")
             Result.success(file.absolutePath)
         } catch (e: Exception) {
-            Log.e("CatRepo", "❌ Erreur téléchargement: ${e.message}")
+            Log.e("CatRepo", "Download error: ${e.message}")
             Result.failure(e)
         }
     }
 
-    // Récupère la dernière image en cache (pour affichage immédiat)
+    // Get the last cached cat image
     suspend fun getLatestCachedCat(): String? = withContext(Dispatchers.IO) {
         dao.getLatestRandomCat()?.imageFilePath
     }

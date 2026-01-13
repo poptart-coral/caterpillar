@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class CachedCatImage(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val imageFilePath: String,  // Chemin local du fichier
+    val imageFilePath: String,
     val downloadedAt: Long,
     val isRandomCat: Boolean = true
 )
