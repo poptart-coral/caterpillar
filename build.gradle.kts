@@ -1,4 +1,3 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
@@ -27,11 +26,30 @@ tasks.register("installGitHooks") {
     doLast {
         val hookFile = file("$rootDir/.git/hooks/pre-commit")
 
-        if (!System.getProperty("os.name").lowercase().contains("windows")) {
-            hookFile.setExecutable(true, false)
+        // Check the file exist
+        if (!hookFile.exists()) {
+            logger.error("Hook file not found after copy")
+            throw GradleException("Failed to copy pre-commit hook")
         }
 
-        logger.lifecycle("Git hooks installed successfully!")
+        // Set executable
+        val success = hookFile.setExecutable(true, false)
+
+        if (!success) {
+            logger.warn("Could not set executable via Gradle, trying chmod...")
+
+            exec {
+                commandLine("chmod", "+x", hookFile.absolutePath)
+                isIgnoreExitValue = true
+            }
+        }
+
+        // Check it is executable
+        if (hookFile.canExecute()) {
+            logger.lifecycle("Git hooks installed successfully!")
+        } else {
+            logger.error("Hook installed but not executable. Run: chmod +x .git/hooks/pre-commit")
+        }
     }
 }
 

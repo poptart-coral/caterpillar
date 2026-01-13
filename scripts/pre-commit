@@ -1,39 +1,39 @@
 #!/bin/bash
 
 echo ""
-echo "🔍 Running pre-commit checks..."
+echo "Running pre-commit checks..."
 echo "================================"
 echo ""
 
-# Récupère les fichiers Kotlin modifiés
+# Get modified Kotlin files
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep "\.kt$")
 
 if [ -z "$STAGED_FILES" ]; then
-    echo "✅ No Kotlin files to check"
+    echo "No Kotlin files to check"
     exit 0
 fi
 
-echo "📝 Kotlin files to check:"
+echo "Kotlin files to check:"
 echo "$STAGED_FILES"
 echo ""
 
-# Formate le code avec Spotless
-echo "🎨 Formatting code with spotlessApply..."
+# Format code with Spotless
+echo "Formatting code with spotlessApply..."
 ./gradlew spotlessApply --daemon
 
 SPOTLESS_STATUS=$?
 
 if [ $SPOTLESS_STATUS -ne 0 ]; then
     echo ""
-    echo "❌ Spotless formatting failed!"
+    echo "Spotless formatting failed!"
     echo "Fix the errors and try again."
     exit 1
 fi
 
-# Ajoute les changements formatés au commit
+# Add formatted changes to the commit
 echo ""
-echo "✅ Code formatted successfully"
-echo "📦 Adding formatted files to commit..."
+echo "Code formatted successfully"
+echo "Adding formatted files to commit..."
 
 for FILE in $STAGED_FILES; do
     if [ -f "$FILE" ]; then
@@ -42,8 +42,7 @@ for FILE in $STAGED_FILES; do
 done
 
 echo ""
-echo "✅ Pre-commit checks passed!"
-echo "================================"
+echo "Pre-commit checks passed!"
 echo ""
 
 exit 0
