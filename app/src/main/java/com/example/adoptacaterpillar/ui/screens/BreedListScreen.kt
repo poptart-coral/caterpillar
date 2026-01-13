@@ -28,10 +28,7 @@ import com.example.adoptacaterpillar.domain.model.Breed
 import com.example.adoptacaterpillar.ui.viewmodel.BreedViewModel
 
 @Composable
-fun BreedListScreen(
-    viewModel: BreedViewModel = hiltViewModel(),
-    onBreedClick: (String) -> Unit = {}
-) {
+fun BreedListScreen(viewModel: BreedViewModel = hiltViewModel(), onBreedClick: (String) -> Unit = {}) {
     val breeds by viewModel.breeds.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -45,7 +42,7 @@ fun BreedListScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "${breeds.size} races de chats",
+                text = "${breeds.size} breeds of cats",
                 style = MaterialTheme.typography.titleMedium
             )
         }
@@ -66,12 +63,12 @@ fun BreedListScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Erreur: $error")
+                        Text("Error: $error")
                         Button(
                             onClick = { viewModel.loadBreeds() },
                             modifier = Modifier.padding(top = 8.dp)
                         ) {
-                            Text("Réessayer")
+                            Text("Try again")
                         }
                     }
                 }
@@ -116,7 +113,7 @@ fun BreedCard(breed: Breed, onClick: () -> Unit = {}) {
 
             if (breed.origin.isNotEmpty()) {
                 Text(
-                    text = "🌍 ${breed.origin}",
+                    text = "\uD83D\uDCCD From : ${breed.origin}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(top = 4.dp)
@@ -125,7 +122,7 @@ fun BreedCard(breed: Breed, onClick: () -> Unit = {}) {
 
             if (breed.temperament.isNotEmpty()) {
                 Text(
-                    text = breed.temperament,
+                    text = "\uD83D\uDCAD ${breed.temperament}",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 8.dp)
                 )
@@ -133,7 +130,7 @@ fun BreedCard(breed: Breed, onClick: () -> Unit = {}) {
 
             if (breed.lifeSpan.isNotEmpty()) {
                 Text(
-                    text = "⏳ Espérance de vie: ${breed.lifeSpan} ans",
+                    text = "\uD83C\uDF82 Life span: ${breed.lifeSpan} years",
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 4.dp)
                 )

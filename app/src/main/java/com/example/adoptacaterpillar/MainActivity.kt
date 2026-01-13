@@ -7,8 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -24,11 +25,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.adoptacaterpillar.ui.navigation.Screen
 import com.example.adoptacaterpillar.ui.screens.AboutScreen
 import com.example.adoptacaterpillar.ui.screens.BreedDetailScreen
+import com.example.adoptacaterpillar.ui.screens.BreedListScreen
 import com.example.adoptacaterpillar.ui.screens.CatFactScreen
 import com.example.adoptacaterpillar.ui.screens.RandomCatScreen
 import com.example.adoptacaterpillar.ui.theme.AdoptACaterpillarTheme
 import com.example.adoptacaterpillar.ui.viewmodel.CatViewModel
-import com.example.adoptacaterpillar.ui.screens.BreedListScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -56,8 +57,8 @@ fun MainApp() {
 
     val items = listOf(
         Triple(Screen.RandomCat, "Random", Icons.Filled.Refresh),
-        Triple(Screen.Breeds, "Breeds", Icons.Filled.Info),
-        Triple(Screen.CatFacts, "Facts", Icons.Filled.Info),
+        Triple(Screen.Breeds, "Breeds", Icons.Filled.Category),
+        Triple(Screen.CatFacts, "Facts", Icons.Filled.Lightbulb),
         Triple(Screen.About, "About", Icons.Filled.Info)
     )
 
@@ -72,15 +73,19 @@ fun MainApp() {
                 title = {
                     Text(
                         when {
-                            currentRoute == Screen.About.route -> "À propos"
-                            else -> "Chat Aléatoire"
+                            currentRoute?.startsWith(Screen.BreedDetail.route) == true -> "Breed Details"
+                            currentRoute == Screen.Breeds.route -> "Cat Breeds"
+                            currentRoute == Screen.CatFacts.route -> "Random Cat Facts"
+                            currentRoute == Screen.RandomCat.route -> "Random Cute Cat"
+                            currentRoute == Screen.About.route -> "About"
+                            else -> "Adopt a Caterpillar"
                         }
                     )
                 },
                 navigationIcon = {
                     if (showBackButton) {
                         IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     }
                 }

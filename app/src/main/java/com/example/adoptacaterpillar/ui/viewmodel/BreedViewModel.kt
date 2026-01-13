@@ -27,6 +27,15 @@ class BreedViewModel @Inject constructor(
     val error: StateFlow<String?> = _error.asStateFlow()
 
     init {
+        // Observe cache Room
+        viewModelScope.launch {
+            repository.getCachedBreedsFlow().collect { cachedBreeds ->
+                _breeds.value = cachedBreeds
+                Log.d("BreedViewModel", "Loaded ${cachedBreeds.size} breeds from cache")
+            }
+        }
+
+        // Load from API
         loadBreeds()
     }
 
@@ -35,14 +44,17 @@ class BreedViewModel @Inject constructor(
             _isLoading.value = true
             _error.value = null
 
-            repository.getBreeds().fold(
-                onSuccess = { breedsList ->
-                    _breeds.value = breedsList
-                    Log.d("BreedViewModel", "Loaded ${breedsList.size} breeds")
+            repository.refreshBreeds().fold(
+                onSuccess = {
+                    Log.d("BreedViewModel", "Breeds refreshed")
                 },
                 onFailure = { exception ->
                     Log.e("BreedViewModel", "Error: ${exception.message}")
-                    _error.value = exception.message ?: "Loading error"
+                    _error.value = exception.message
+
+                    if (_breeds.value.isEmpty()) {
+                        _error.value = "Pas de connexion et aucune race en cache"
+                    }
                 }
             )
 

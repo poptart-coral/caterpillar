@@ -4,12 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.adoptacaterpillar.data.local.dao.CatImageDao
+import com.example.adoptacaterpillar.data.local.dao.BreedDao
+import com.example.adoptacaterpillar.data.local.entity.CachedBreed
 import com.example.adoptacaterpillar.data.local.entity.CachedCatImage
 
-@Database(entities = [CachedCatImage::class], version = 2, exportSchema = false)
+@Database(entities = [CachedCatImage::class, CachedBreed::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun catImageDao(): CatImageDao
+    abstract fun breedDao(): BreedDao
 
     companion object {
         @Volatile

@@ -14,10 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.adoptacaterpillar.ui.viewmodel.BreedViewModel
 
 @Composable
-fun BreedDetailScreen(
-    breedId: String?,
-    viewModel: BreedViewModel = hiltViewModel()
-) {
+fun BreedDetailScreen(breedId: String?, viewModel: BreedViewModel = hiltViewModel()) {
     val breeds by viewModel.breeds.collectAsState()
     val breed = breeds.find { it.id == breedId }
 
@@ -26,7 +23,7 @@ fun BreedDetailScreen(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = androidx.compose.ui.Alignment.Center
         ) {
-            Text("Race introuvable")
+            Text("Unknown breed")
         }
         return
     }
@@ -47,7 +44,7 @@ fun BreedDetailScreen(
         if (breed.origin.isNotEmpty()) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("🌍 Origine", fontWeight = FontWeight.Bold)
+                    Text("\uD83D\uDCCD Origin", fontWeight = FontWeight.Bold)
                     Text(breed.origin)
                 }
             }
@@ -56,7 +53,7 @@ fun BreedDetailScreen(
         if (breed.temperament.isNotEmpty()) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("😺 Tempérament", fontWeight = FontWeight.Bold)
+                    Text("✨ Temperament", fontWeight = FontWeight.Bold)
                     Text(breed.temperament)
                 }
             }
@@ -65,7 +62,7 @@ fun BreedDetailScreen(
         if (breed.description.isNotEmpty()) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("📝 Description", fontWeight = FontWeight.Bold)
+                    Text("\uD83D\uDCAD Description", fontWeight = FontWeight.Bold)
                     Text(breed.description)
                 }
             }
@@ -74,8 +71,8 @@ fun BreedDetailScreen(
         if (breed.lifeSpan.isNotEmpty()) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("⏳ Espérance de vie", fontWeight = FontWeight.Bold)
-                    Text("${breed.lifeSpan} ans")
+                    Text("\uD83C\uDF82 Life span", fontWeight = FontWeight.Bold)
+                    Text("${breed.lifeSpan} years")
                 }
             }
         }

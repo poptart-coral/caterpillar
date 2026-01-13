@@ -3,11 +3,14 @@ package com.example.adoptacaterpillar.data.repository
 import android.content.Context
 import android.util.Log
 import com.example.adoptacaterpillar.data.local.AppDatabase
+import com.example.adoptacaterpillar.data.local.entity.CachedBreed
 import com.example.adoptacaterpillar.data.remote.api.TheCatApiService
 import com.example.adoptacaterpillar.domain.model.Breed
 import com.example.adoptacaterpillar.domain.repository.CatRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -15,7 +18,48 @@ class CatRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val apiService: TheCatApiService
 ) : CatRepository {
-    private val dao = AppDatabase.getDatabase(context).catImageDao()
+    private val breedDao = AppDatabase.getDatabase(context).breedDao()
+    fun getCachedBreedsFlow(): Flow<List<Breed>> {
+        return breedDao.getAllBreeds().map { cachedList ->
+            cachedList.map { it.toBreed() }
+        }
+    }
+
+    suspend fun refreshBreeds(): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            Log.d("CatRepo", "Fetching breeds from API...")
+            val breedsDto = apiService.getBreeds()
+
+            val cachedBreeds = breedsDto.map { dto ->
+                CachedBreed(
+                    id = dto.id,
+                    name = dto.name,
+                    temperament = dto.temperament,
+                    description = dto.description,
+                    lifeSpan = dto.life_span,
+                    origin = dto.origin
+                )
+            }
+
+            breedDao.deleteAll()
+            breedDao.insertAll(cachedBreeds)
+
+            Log.d("CatRepo", "Cached ${cachedBreeds.size} breeds")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("CatRepo", "Error: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+
+    private fun CachedBreed.toBreed() = Breed(
+        id = id,
+        name = name,
+        temperament = temperament,
+        description = description,
+        lifeSpan = lifeSpan,
+        origin = origin
+    )
 
     override fun getRandomCatUrl(): String {
         return "https://cataas.com/cat?timestamp=${System.currentTimeMillis()}"

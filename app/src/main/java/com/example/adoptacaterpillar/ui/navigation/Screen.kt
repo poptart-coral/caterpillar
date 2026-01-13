@@ -1,7 +1,6 @@
 package com.example.adoptacaterpillar.ui.navigation
 
 sealed class Screen(val route: String) {
-    object Home : Screen("home")
     object RandomCat : Screen("random_cat")
     object About : Screen("about")
 
