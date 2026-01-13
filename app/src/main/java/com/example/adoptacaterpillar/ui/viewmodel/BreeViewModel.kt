@@ -42,7 +42,7 @@ class BreedViewModel @Inject constructor(
                 },
                 onFailure = { exception ->
                     Log.e("BreedViewModel", "Error: ${exception.message}")
-                    _error.value = exception.message ?: "Erreur de chargement"
+                    _error.value = exception.message ?: "Loading error"
                 }
             )
 

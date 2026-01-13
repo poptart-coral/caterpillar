@@ -24,11 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.adoptacaterpillar.domain.model.Breed
 import com.example.adoptacaterpillar.ui.viewmodel.BreedViewModel
 
 @Composable
 fun BreedListScreen(
-    viewModel: BreedViewModel = hiltViewModel()
+    viewModel: BreedViewModel = hiltViewModel(),
+    onBreedClick: (String) -> Unit = {}
 ) {
     val breeds by viewModel.breeds.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -43,7 +45,7 @@ fun BreedListScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Actuellement ${breeds.size} races de chats",
+                text = "${breeds.size} races de chats",
                 style = MaterialTheme.typography.titleMedium
             )
         }
@@ -85,7 +87,10 @@ fun BreedListScreen(
                         items = breeds,
                         key = { it.id }
                     ) { breed ->
-                        BreedCard(breed)
+                        BreedCard(
+                            breed = breed,
+                            onClick = { onBreedClick(breed.id) }
+                        )
                     }
                 }
             }
@@ -94,11 +99,11 @@ fun BreedListScreen(
 }
 
 @Composable
-fun BreedCard(breed: com.example.adoptacaterpillar.domain.model.Breed) {
+fun BreedCard(breed: Breed, onClick: () -> Unit = {}) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { /* TODO: navigation vers détail */ }
+            .clickable { onClick() }
     ) {
         Column(
             modifier = Modifier.padding(16.dp)

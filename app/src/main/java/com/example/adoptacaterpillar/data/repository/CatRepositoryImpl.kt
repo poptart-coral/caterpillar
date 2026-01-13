@@ -37,10 +37,10 @@ class CatRepositoryImpl @Inject constructor(
                 )
             }
 
-            Log.d("CatRepo", "✅ Fetched ${breeds.size} breeds")
+            Log.d("CatRepo", "Fetched ${breeds.size} breeds")
             Result.success(breeds)
         } catch (e: Exception) {
-            Log.e("CatRepo", "❌ Error fetching breeds: ${e.message}", e)
+            Log.e("CatRepo", "Error fetching breeds: ${e.message}", e)
             Result.failure(e)
         }
     }

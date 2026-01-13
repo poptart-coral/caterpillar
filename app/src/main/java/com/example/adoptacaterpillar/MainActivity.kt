@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -24,9 +23,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.adoptacaterpillar.ui.navigation.Screen
 import com.example.adoptacaterpillar.ui.screens.AboutScreen
-import com.example.adoptacaterpillar.ui.screens.CatDetailScreen
+import com.example.adoptacaterpillar.ui.screens.BreedDetailScreen
 import com.example.adoptacaterpillar.ui.screens.CatFactScreen
-import com.example.adoptacaterpillar.ui.screens.CatListScreen
 import com.example.adoptacaterpillar.ui.screens.RandomCatScreen
 import com.example.adoptacaterpillar.ui.theme.AdoptACaterpillarTheme
 import com.example.adoptacaterpillar.ui.viewmodel.CatViewModel
@@ -58,13 +56,12 @@ fun MainApp() {
 
     val items = listOf(
         Triple(Screen.RandomCat, "Random", Icons.Filled.Refresh),
-        Triple(Screen.CatList, "Adopt", Icons.AutoMirrored.Filled.List),
         Triple(Screen.Breeds, "Breeds", Icons.Filled.Info),
         Triple(Screen.CatFacts, "Facts", Icons.Filled.Info),
         Triple(Screen.About, "About", Icons.Filled.Info)
     )
 
-    // Affiche le bouton retour si on n'est pas sur une destination racine
+    // Show the back button if we are not on a root destination
     val canNavigateBack = navController.previousBackStackEntry != null
     val isRootDestination = items.any { it.first.route == currentRoute }
     val showBackButton = canNavigateBack && !isRootDestination
@@ -75,8 +72,6 @@ fun MainApp() {
                 title = {
                     Text(
                         when {
-                            currentRoute?.startsWith("cat_detail") == true -> "Détails du chat"
-                            currentRoute == Screen.CatList.route -> "Adopter un chat"
                             currentRoute == Screen.About.route -> "À propos"
                             else -> "Chat Aléatoire"
                         }
@@ -118,17 +113,17 @@ fun MainApp() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.RandomCat.route) { RandomCatScreen(viewModel) }
-            composable(Screen.CatList.route) {
-                CatListScreen(viewModel) { catId ->
-                    navController.navigate(Screen.CatDetail.createRoute(catId))
+
+            composable(Screen.About.route) { AboutScreen() }
+            composable(Screen.CatFacts.route) { CatFactScreen() }
+            composable(Screen.Breeds.route) {
+                BreedListScreen { breedId ->
+                    navController.navigate(Screen.BreedDetail.createRoute(breedId))
                 }
             }
-            composable(Screen.About.route) { AboutScreen() }
-            composable(Screen.Breeds.route) { BreedListScreen() }
-            composable(Screen.CatFacts.route) { CatFactScreen() }
-            composable(Screen.CatDetail.route) { backStackEntry ->
-                val catId = backStackEntry.arguments?.getString("catId")
-                CatDetailScreen(viewModel, catId)
+            composable(Screen.BreedDetail.route) { backStackEntry ->
+                val breedId = backStackEntry.arguments?.getString("breedId")
+                BreedDetailScreen(breedId)
             }
         }
     }
