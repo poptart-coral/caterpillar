@@ -8,51 +8,54 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
-import coil3.request.CachePolicy
-import coil3.request.ImageRequest
 import com.example.adoptacaterpillar.ui.viewmodel.CatViewModel
+import java.io.File
 
 @Composable
 fun RandomCatScreen(viewModel: CatViewModel) {
-    val refreshKey by viewModel.refreshTrigger.collectAsState() // Use refreshTrigger
+    val currentImagePath by viewModel.currentRandomCatPath.collectAsState()
+    val isLoading by viewModel.isLoadingRandomCat.collectAsState()
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        SubcomposeAsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data("https://cataas.com/cat?refresh=$refreshKey") // URL with key
-                .diskCachePolicy(CachePolicy.DISABLED)
-                .memoryCachePolicy(CachePolicy.DISABLED)
-                .build(),
-            loading = {
-                Box(
-                    modifier = Modifier.fillMaxWidth().height(400.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            },
-            error = {
-                Box(
-                    modifier = Modifier.fillMaxWidth().height(400.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Error: check your connection")
-                }
-            },
-            contentDescription = "Random Cat",
-            modifier = Modifier.fillMaxWidth().height(400.dp),
-            contentScale = ContentScale.Crop
-        )
+        if (currentImagePath != null) {
+            SubcomposeAsyncImage(
+                model = File(currentImagePath!!),
+                contentDescription = "Random Cat",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(400.dp),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(400.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("No cat yet, click refresh!")
+            }
+        }
+
         Spacer(modifier = Modifier.height(24.dp))
-        Button(onClick = { viewModel.refreshRandomCat() }) {
-            Text("Refresh Cat")
+
+        Button(
+            onClick = { viewModel.downloadNewRandomCat() },
+            enabled = !isLoading
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(modifier = Modifier.size(20.dp))
+            } else {
+                Text("Refresh Cat")
+            }
         }
     }
 }

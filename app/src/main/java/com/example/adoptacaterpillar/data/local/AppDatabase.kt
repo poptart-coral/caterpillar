@@ -5,12 +5,18 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.adoptacaterpillar.data.local.dao.BreedDao
+import com.example.adoptacaterpillar.data.local.dao.RandomCatDao
 import com.example.adoptacaterpillar.data.local.entity.CachedBreed
-import com.example.adoptacaterpillar.data.local.entity.CachedCatImage
+import com.example.adoptacaterpillar.data.local.entity.CachedRandomCat
 
-@Database(entities = [CachedCatImage::class, CachedBreed::class], version = 3, exportSchema = false)
+@Database(
+    entities = [CachedBreed::class, CachedRandomCat::class],
+    version = 5,
+    exportSchema = false
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun breedDao(): BreedDao
+    abstract fun randomCatDao(): RandomCatDao
 
     companion object {
         @Volatile

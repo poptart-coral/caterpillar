@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.example.adoptacaterpillar.data.local.AppDatabase
 import com.example.adoptacaterpillar.data.local.entity.CachedBreed
+import com.example.adoptacaterpillar.data.local.entity.CachedRandomCat
 import com.example.adoptacaterpillar.data.remote.api.TheCatApiService
 import com.example.adoptacaterpillar.domain.model.Breed
 import com.example.adoptacaterpillar.domain.repository.CatRepository
@@ -12,6 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.net.URL
 import javax.inject.Inject
 
 class CatRepositoryImpl @Inject constructor(
@@ -19,13 +22,31 @@ class CatRepositoryImpl @Inject constructor(
     private val apiService: TheCatApiService
 ) : CatRepository {
     private val breedDao = AppDatabase.getDatabase(context).breedDao()
-    fun getCachedBreedsFlow(): Flow<List<Breed>> {
+    private val randomCatDao = AppDatabase.getDatabase(context).randomCatDao()
+
+    override suspend fun getLatestRandomCatPath(): String? = withContext(Dispatchers.IO) {
+        randomCatDao.getLatestCat()?.imageFilePath
+    }
+
+    override suspend fun downloadRandomCat(): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val file = File(context.filesDir, "cat_${System.currentTimeMillis()}.jpg")
+            URL("https://cataas.com/cat").openStream().use { it.copyTo(file.outputStream()) }
+            randomCatDao.insert(CachedRandomCat(imageFilePath = file.absolutePath))
+            randomCatDao.keepOnlyRecent()
+            Result.success(file.absolutePath)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override fun getCachedBreedsFlow(): Flow<List<Breed>> {
         return breedDao.getAllBreeds().map { cachedList ->
             cachedList.map { it.toBreed() }
         }
     }
 
-    suspend fun refreshBreeds(): Result<Unit> = withContext(Dispatchers.IO) {
+    override suspend fun refreshBreeds(): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             Log.d("CatRepo", "Fetching breeds from API...")
             val breedsDto = apiService.getBreeds()
@@ -60,32 +81,4 @@ class CatRepositoryImpl @Inject constructor(
         lifeSpan = lifeSpan,
         origin = origin
     )
-
-    override fun getRandomCatUrl(): String {
-        return "https://cataas.com/cat?timestamp=${System.currentTimeMillis()}"
-    }
-
-    override suspend fun getBreeds(): Result<List<Breed>> = withContext(Dispatchers.IO) {
-        try {
-            Log.d("CatRepo", "Fetching breeds from API...")
-            val breedsDto = apiService.getBreeds()
-
-            val breeds = breedsDto.map { dto ->
-                Breed(
-                    id = dto.id,
-                    name = dto.name,
-                    temperament = dto.temperament,
-                    description = dto.description,
-                    lifeSpan = dto.life_span,
-                    origin = dto.origin
-                )
-            }
-
-            Log.d("CatRepo", "Fetched ${breeds.size} breeds")
-            Result.success(breeds)
-        } catch (e: Exception) {
-            Log.e("CatRepo", "Error fetching breeds: ${e.message}", e)
-            Result.failure(e)
-        }
-    }
 }
