@@ -15,7 +15,4 @@ interface BreedDao {
 
     @Query("DELETE FROM cached_breeds")
     suspend fun deleteAll()
-
-    @Query("SELECT COUNT(*) FROM cached_breeds")
-    suspend fun getCount(): Int
 }

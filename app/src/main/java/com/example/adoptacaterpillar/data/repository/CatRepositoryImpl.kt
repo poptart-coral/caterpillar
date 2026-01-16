@@ -27,10 +27,9 @@ class CatRepositoryImpl @Inject constructor(
     private val breedDao = AppDatabase.getDatabase(context).breedDao()
     private val randomCatDao = AppDatabase.getDatabase(context).randomCatDao()
 
-    override suspend fun getLatestRandomCatPath(): String? = withContext(Dispatchers.IO) {
-        randomCatDao.getLatestCat()?.imageFilePath
+    override fun getLatestCatFlow(): Flow<CachedRandomCat?> {
+        return randomCatDao.getLatestCatFlow()
     }
-
     override suspend fun downloadRandomCat(): Result<String> = withContext(Dispatchers.IO) {
         try {
             val file = File(context.filesDir, "cat_${System.currentTimeMillis()}.jpg")
@@ -52,6 +51,7 @@ class CatRepositoryImpl @Inject constructor(
     override suspend fun refreshBreeds(): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             Log.d("CatRepo", "Fetching breeds from API...")
+            // TODO use serializable
             val breedsDto = breedApiService.getBreeds()
 
             val cachedBreeds = breedsDto.map { dto ->
@@ -60,7 +60,7 @@ class CatRepositoryImpl @Inject constructor(
                     name = dto.name,
                     temperament = dto.temperament,
                     description = dto.description,
-                    lifeSpan = dto.life_span,
+                    lifeSpan = dto.lifeSpan,
                     origin = dto.origin
                 )
             }
@@ -68,7 +68,6 @@ class CatRepositoryImpl @Inject constructor(
             breedDao.deleteAll()
             breedDao.insertAll(cachedBreeds)
 
-            Log.d("CatRepo", "Cached ${cachedBreeds.size} breeds")
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e("CatRepo", "Error: ${e.message}", e)
@@ -80,7 +79,6 @@ class CatRepositoryImpl @Inject constructor(
         try {
             val factResponse = factsApiService.getRandomFact()
             val fact = CatFact(factResponse.data.first())
-            Log.d("CatRepo", "Fact: ${fact.fact}")
             Result.success(fact)
         } catch (e: Exception) {
             Log.e("CatRepo", "Fact error: ${e.message}")

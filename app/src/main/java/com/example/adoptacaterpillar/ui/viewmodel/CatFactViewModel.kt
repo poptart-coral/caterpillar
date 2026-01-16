@@ -1,5 +1,6 @@
 package com.example.adoptacaterpillar.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.adoptacaterpillar.R
@@ -52,9 +53,10 @@ class CatFactViewModel @Inject constructor(
                 if (result.isSuccess) {
                     _currentFact.value = result.getOrNull()
                 } else {
-                    _currentFact.value = CatFact(fact = "oops")
+                    _currentFact.value = CatFact(fact = "oops no facts for you")
                 }
             } catch (e: Exception) {
+                Log.d("CatFactViewModel", "Error: ${e.message}")
                 _currentFact.value = CatFact(fact = "oops")
             }
 

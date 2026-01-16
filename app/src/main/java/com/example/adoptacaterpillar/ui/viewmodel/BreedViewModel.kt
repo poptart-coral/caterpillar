@@ -53,7 +53,7 @@ class BreedViewModel @Inject constructor(
                     _error.value = exception.message
 
                     if (_breeds.value.isEmpty()) {
-                        _error.value = "Pas de connexion et aucune race en cache"
+                        _error.value = "No connection and no breeds in cache"
                     }
                 }
             )

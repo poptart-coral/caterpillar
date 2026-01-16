@@ -8,6 +8,6 @@ data class BreedDto(
     val name: String,
     val temperament: String = "",
     val description: String = "",
-    val life_span: String = "",
+    val lifeSpan: String = "",
     val origin: String = ""
 )
